@@ -1,9 +1,16 @@
 const BlockChain = require("./BlockChain");
-const Block = require("./Block");
+const Transaction = require("./Transaction");
 
 let UniCoin = new BlockChain();
-console.log('Mining block 1...');
-UniCoin.addBlock(new Block(1, "20/07/2017", { amount: 4 }));
+UniCoin.createTransaction(new Transaction('address1', 'address2', 100));
+UniCoin.createTransaction(new Transaction('address2', 'address1', 50));
 
-console.log('Mining block 2...');
-UniCoin.addBlock(new Block(2, "20/07/2017", { amount: 8 }));
+console.log('\n Starting the miner...');
+UniCoin.minePendingTransactions('mditran-address');
+
+console.log('\nBalance of xavier is', UniCoin.getBalanceOfAddress('mditran-address'));
+
+console.log('\n Starting the miner again...');
+UniCoin.minePendingTransactions('mditran-address');
+
+console.log('\nBalance of xavier is', UniCoin.getBalanceOfAddress('mditran-address'));
