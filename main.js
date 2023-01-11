@@ -1,16 +1,51 @@
 const BlockChain = require("./BlockChain");
 const Transaction = require("./Transaction");
 
-let UniCoin = new BlockChain();
-UniCoin.createTransaction(new Transaction('address1', 'address2', 100));
-UniCoin.createTransaction(new Transaction('address2', 'address1', 50));
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
-console.log('\n Starting the miner...');
-UniCoin.minePendingTransactions('mditran-address');
+// Your private key goes here
+const myKey = ec.keyFromPrivate('d41b6d944c98b6bf94527142ffbf2a587769ee99917e984683a019df74e0cf0e');
+// From that we can calculate your public key (which doubles as your wallet address)
+const myWalletAddress = myKey.getPublic('hex');
 
-console.log('\nBalance of xavier is', UniCoin.getBalanceOfAddress('mditran-address'));
+// Create new instance of Blockchain class
+const uniCoin = new BlockChain();
+// Mine first block
+uniCoin.minePendingTransactions(myWalletAddress);
 
-console.log('\n Starting the miner again...');
-UniCoin.minePendingTransactions('mditran-address');
+// Create a transaction & sign it with your key
+const tx1 = new Transaction(myWalletAddress, 'public key goes here', 10);
+tx1.signTransaction(myKey);
+uniCoin.addTransaction(tx1);
 
-console.log('\nBalance of xavier is', UniCoin.getBalanceOfAddress('mditran-address'));
+// Mine block
+console.log("\nStaring the miner....");
+uniCoin.minePendingTransactions(myWalletAddress);
+
+console.log(
+    "\nBalance of Mike is ",
+    uniCoin.getBalanceOfAddress(myWalletAddress)
+);
+// Create second transaction
+const tx2 = new Transaction(myWalletAddress, 'address1', 50);
+tx2.signTransaction(myKey);
+uniCoin.addTransaction(tx2);
+
+// Mine block
+uniCoin.minePendingTransactions(myWalletAddress);
+
+console.log();
+console.log(
+    `Balance of Mike is ${uniCoin.getBalanceOfAddress(myWalletAddress)}`
+);
+
+// Uncomment this line if you want to test tampering with the chain
+// uniCoin.chain[1].transactions[0].amount = 10;
+
+// Check if the chain is valid
+console.log();
+console.log('Blockchain valid?', uniCoin.isChainValid() ? 'Yes' : 'No');
+
+//npm install --save crypto-js
+//npm install elliptic
