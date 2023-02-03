@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const SHA256 = require("crypto-js/sha256");
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 
@@ -15,15 +15,12 @@ class Transaction {
         this.timestamp = Date.now();
     }
     /**
-       * Creates a SHA256 hash of the transaction
+       * Creates a hash of the transaction using bcrypt
        *
        * @returns {string}
        */
-    calculateHash() {
-        return crypto
-            .createHash('sha256')
-            .update(this.fromAddress + this.toAddress + this.amount + this.timestamp)
-            .digest('hex');
+    calculateHash(){
+        return SHA256(this.fromAddress + this.toAddress + this.amount).toString();
     }
     /**
       * Signs a transaction with the given signingKey (which is an Elliptic keypair
